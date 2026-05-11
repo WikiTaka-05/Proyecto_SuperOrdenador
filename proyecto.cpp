@@ -1,13 +1,34 @@
-﻿#include <iostream>
+#include <iostream>
 #include <string>
 
 using namespace std;
 
 
+/*==========================================================
+1. ESTRUCTURAS DE EQUIPOS 
+==========================================================*/
+struct EquipoNeon {
+    int ip_bando = 1;
+    string nombre = "Resistencia Neon";
+};
 
-// ==========================================================
-// 1. ESTRUCTURAS DE EQUIPO (PILAS Y COLAS)
-// ==========================================================
+struct EquipoOmega {
+    int ip_bando = 2;
+    string nombre = "Corporacion OMEGA";
+};
+
+/*==========================================================
+2. ESTRUCTURA DE LISTA PARA ITEMS (ITEMS PARA LA SEGUNDA ENTREGA) Y ARMAS 
+============================================================*/
+struct NodoItem {
+    string nombre_item;
+    NodoItem* siguiente;
+};
+struct Arma {string nombre; int dano; };
+
+/*========================================================
+2. ESTRUCTURAS DE BALAS Y ESCUDOS
+==========================================================*/
 struct NodoDato {
     string info;
     NodoDato* sig;
@@ -35,31 +56,10 @@ struct ColaBalas {
     }
 };
 
-// ==========================================================
-// 1. ESTRUCTURAS DE EQUIPOS (BANDOS) - INDEPENDIENTES
-// ==========================================================
-struct EquipoNeon {
-    int ip_bando = 1;
-    string nombre = "Resistencia Neon";
-};
 
-struct EquipoOmega {
-    int ip_bando = 2;
-    string nombre = "Corporacion OMEGA";
-};
-
-// ==========================================================
-// 2. ESTRUCTURA DE LISTA PARA ITEMS (ITEMS PARA LA SEGUNDA ENTREGA) Y ARMAS 
-// ==========================================================
-struct NodoItem {
-    string nombre_item;
-    NodoItem* siguiente;
-};
-struct Arma {string nombre; int dano; };
-
-// ==========================================================
-// 3. ESTRUCTURAS DE PERSONAJES (SOLOS)
-// ==========================================================
+/*==========================================================
+3. ESTRUCTURAS DE PERSONAJES (SOLOS)
+============================================================*/
 
 struct Juggernaut {
     int ip;
@@ -67,6 +67,7 @@ struct Juggernaut {
     int escudo = 100;
     Arma arma = {"Canon de Riel", 15};
     string clase = "Juggernaut";
+    string habilidad = "Fuerza Bruta"; // NUEVO
 };
 
 struct Espectro {
@@ -75,6 +76,7 @@ struct Espectro {
     int escudo = 100;   // Escudo solicitado
     Arma arma = {"Daga de datos", 10};
     string clase = "Espectro"; // Fantasma
+    string habilidad = "Sigilo Optico"; // NUEVO
 };
 
 struct Hacker {
@@ -83,6 +85,7 @@ struct Hacker {
     int escudo = 100;   // Escudo solicitado
     Arma arma = {"Virus de Enlace", 30};
     string clase = "Hacker";
+    string habilidad = "Control de Mentes"; // NUEVO
 };
 
 struct Healer {
@@ -91,19 +94,21 @@ struct Healer {
     int escudo = 100;
     Arma arma = {"Varita de Sauco", 5};
     string clase = "Sacerdote";
+    string habilidad = "Curacion Amiga"; // NUEVO
 };
 
 struct Ejecutor {
     int ip;
-    int vida = 80;
+    int vida = 100;
     int escudo = 100;
     Arma arma = {"Cuchillas sangrientas", 40};
     string clase = "Asesino";
+    string habilidad = "Golpe Subito"; // NUEVO
 };
 
-// ==========================================================
-// 4. NODO DEL SISTEMA (CRUD)
-// ==========================================================
+/* ==========================================================
+4. NODO DEL SISTEMA
+==========================================================*/
 struct NodoSistema {
     int ip_personaje;
     int ip_bando;
@@ -113,13 +118,14 @@ struct NodoSistema {
     string clase;
     string nombre_bando;
     string n_arma;
+    string habilidad; 
     
     NodoSistema* siguiente = nullptr;
 };
 
-// ==========================================================
-// 5. FUNCIONES
-// ==========================================================
+/*==========================================================
+5. FUNCIONES
+==========================================================*/
 
 // --- CREATE (Crear e Inyectar) ---
 void crear(NodoSistema* &cabeza) {
@@ -181,7 +187,7 @@ void crear(NodoSistema* &cabeza) {
     cout << "-> Operativo de inyectado con exito.\n";
 }
 
-// --- READ (Leer / Ver) ---
+// --- (Leer / Ver) ---
 void leer(NodoSistema* cabeza) {
     if (!cabeza) { cout << "\nNo hay operativos en red.\n"; return; }
     NodoSistema* aux = cabeza;
@@ -193,7 +199,7 @@ void leer(NodoSistema* cabeza) {
     }
 }
 
-// --- UPDATE (Actualizar Vida y Escudo) ---
+// --- (Actualizar Vida y Escudo) ---
 void actualizar(NodoSistema* cabeza, int ip_buscar) {
     NodoSistema* aux = cabeza;
     while (aux != nullptr) {
@@ -209,7 +215,7 @@ void actualizar(NodoSistema* cabeza, int ip_buscar) {
     cout << "-> IP no localizada.\n";
 }
 
-// --- DELETE (Borrar) ---
+// --- (Borrar individual) ---
 void borrar(NodoSistema* &cabeza, int ip_buscar) {
     NodoSistema* aux = cabeza;
     NodoSistema* anterior = nullptr;
@@ -228,22 +234,34 @@ void borrar(NodoSistema* &cabeza, int ip_buscar) {
     cout << "-> Operativo eliminado de la memoria.\n";
 }
 
+//(Borra todos) 
+void borrar_todo(NodoSistema* &inicio) {
+    NodoSistema* aux;
+    while (inicio != nullptr) {
+        aux = inicio;
+        inicio = inicio->siguiente;
+        delete aux; 
+    }
+    cout << "-> BARRIDO COMPLETO: Todos los operativos han sido eliminados de la red.\n";
+}
 
 
-// ==========================================================
-// 6. MENU
-// ==========================================================
+
+/*========================================================
+6. MENU
+==========================================================*/
 int main() {
     NodoSistema* yggdrasil = nullptr;
     int opcion, id_busqueda;
 
-    do {
+    while (opcion != 6){
         cout << "\n--- NUCLEO YGGDRAZIL ---" << endl;
         cout << "1. Crear Operativo" << endl;
         cout << "2. Ver Operativos" << endl;
         cout << "3. Actualizar Vida/Escudo" << endl;
         cout << "4. Eliminar Operativo" << endl;
-        cout << "5. Salir" << endl;
+        cout << "5. Elminar Sistema cuantico" << endl;
+        cout << "6. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
@@ -256,8 +274,12 @@ int main() {
             case 4: 
                 cout << "Ingrese IP a borrar: "; cin >> id_busqueda;
                 borrar(yggdrasil, id_busqueda); break;
+            case 5:
+                cout << "borrar a todo el ordenador cuantico";
+                borrar_todo(yggdrasil); break;
+            case 6: cout << "Saliendo del sistema Yggdrasil"; break;
         }
-    } while (opcion != 5);
+    };
 
     return 0;
 }
