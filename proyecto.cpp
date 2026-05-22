@@ -586,13 +586,13 @@ int main() {
 
     while (opcion != 9) {
         cout << "\n--- NUCLEO YGGDRAZIL (PILA Y COLA INTEGRADAS) ---" << endl;
-        cout << "1. Inyectar Operativo (Genera Suministros Cola FIFO)" << endl;
-        cout << "2. Ver Operativos (Muestra Tope Pila y Frente Cola)" << endl;
+        cout << "1. Inyectar Operativo" << endl;
+        cout << "2. Ver Operativos" << endl;
         cout << "3. Actualizar HP_Base / Apilar Escudo" << endl;
         cout << "4. Eliminar Operativo Manualmente" << endl;
         cout << "5. Reiniciar Sistema" << endl;
         cout << "6. Ver Items Tirados en el Suelo" << endl;
-        cout << "7. [BATALLA] SIMULAR DISPARO (Usa Cola FIFO y Rompe Pila LIFO)" << endl;
+        cout << "7. [BATALLA] SIMULAR DISPARO" << endl;
         cout << "8. [MECANICA] USAR HABILIDAD ESPECIAL DE LA CLASE" << endl;
         cout << "9. Salir" << endl;
         cout << "Seleccion: "; opcion = leerEnteroSeguro();
