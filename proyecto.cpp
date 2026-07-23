@@ -782,18 +782,32 @@ bool ejecutarHabilidad(ArbolB& arbol, NodoItem*& itemsCaidos) {
             cout << "[Aviso] Objetivo invalido o es un aliado.\n";
             return false;
         }
-        if (ejecutor->operativo.arma_assigned == nullptr || objetivo->operativo.arma_assigned == nullptr) {
-            cout << "[Aviso] Uno de los dos operativos involucrados no posee armas.\n";
+        if (objetivo->operativo.vida <= 0) {
+            cout << "[Aviso] No puedes reprogramar un operativo destruido.\n";
             return false;
         }
-        int balasRobadas = min(5, objetivo->operativo.arma_assigned->bullets_actuales);
-        objetivo->operativo.arma_assigned->bullets_actuales -= balasRobadas;
-        ejecutor->operativo.arma_assigned->bullets_actuales += balasRobadas;
-        if (ejecutor->operativo.arma_assigned->bullets_actuales > ejecutor->operativo.arma_assigned->cargador_maximo) {
-            ejecutor->operativo.arma_assigned->bullets_actuales = ejecutor->operativo.arma_assigned->cargador_maximo;
+
+        int bandoAnterior = objetivo->ip_bando;
+        objetivo->ip_bando = ejecutor->ip_bando;
+        objetivo->nombre_bando = ejecutor->nombre_bando;
+
+        if (bandoAnterior == 1) {
+        contadorNeon--;
+        contadorOmega++;
         }
-        cout << "[!] Exito. Has hackeado el arma del rival, extrayendo " << balasRobadas << " balas directamente a tu cargador.\n";
-    } else if (hab == "Curacion Amiga" || clase == "Sacerdote") {
+        else {
+        contadorOmega--;
+        contadorNeon++;
+        }
+        
+        cout << "\n[¡HACKEO EXITOSO!] La mente del operativo IP " << ipObj 
+        << " ha sido reescrita.\n";
+        cout << "-> Bando anterior: " << (bandoAnterior == 1 ? "Resistencia Neon" : "Corporacion OMEGA") << "\n";
+        cout << "-> Nuevo Bando: " << objetivo->nombre_bando << "\n";
+        cout << "-> Poblacion actualizada -> Neon: " << contadorNeon << " | Omega: " << contadorOmega << "\n";
+        return true;
+        }
+        } else if (hab == "Curacion Amiga" || clase == "Sacerdote") {
         cout << "Ingrese IP del Operativo Aliado a quien deseas curar: ";
         int ipAliado = leerEnteroSeguro();
         RegistroOperativo* aliado = buscarOperativoPorIP(arbol, ipAliado);
@@ -1312,7 +1326,7 @@ void mostrarIntroduccion() {
 }
 
 bool verificarVictoriaRaiz(NodoB* raiz, ControlRaiz& estadoRaiz) {
-    if (raiz == nullptr || raiz->cantidad() == 0) {
+    if (raiz == nullptr || raiz->cantidad() < 3) {
         estadoRaiz.rondasConsecutivas = 0;
         estadoRaiz.bandoDominanteActual = 0;
         return false;
@@ -1424,13 +1438,18 @@ int main() {
     while (opcion != 0) {
         if (accionesRestantes <= 0) {
             avanzarTurno();
-            if (verificarVictoriaRaiz(yggdrasil.getRaiz(), estadoRaiz)|| verificarVictoriaPorPoblacion(contadorNeon, contadorOmega)) {
-                cout << "\n[SISTEMA] Cerrando conexión por victoria absoluta.\n";
-                break;
-            }
+
+            if(contadorTurno > 3){
+                if (verificarVictoriaRaiz(yggdrasil.getRaiz(), estadoRaiz)|| verificarVictoriaPorPoblacion(contadorNeon, contadorOmega)) {
+                    cout << "\n[SISTEMA] Cerrando conexión por victoria absoluta.\n";
+                    break;
+                }
         }
         cout << "\n--- NUCLEO YGGDRAZIL ---" << endl;
         cout << "Turno #" << contadorTurno << " | Le toca a: " << nombreDelTurnoActual() << endl;
+        if (contadorTurno <= 3) {
+            cout << " [FASE DE DESPLIEGUE INICIAL: Solo se permite la insercion de operativos]" << endl;
+        }
         cout << "Acciones Restantes: " << accionesRestantes << " << " << endl;
         cout << "1. Registrar/Crear Operativo (1pto de accion)" << endl;
         cout << "2. Ver Operativos en Red (Gratis)" << endl;
@@ -1445,6 +1464,11 @@ int main() {
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         opcion = leerEnteroSeguro();
+
+        if (contadorTurno <= 3 && opcion != 1 && opcion != 2 && opcion != 4 && opcion != 0) {
+            cout << "\n[REGLA ACTIVADA!] Durante las primeras 3 rondas solo se permite el despliegue de operativos (Opcion 1).\n";
+            continue; 
+        }
 
         if (opcion == 1) {
             if (crear(yggdrasil, arsenalBase, TAM_BASE, arsenalCustom, sueloItemsCaidos)) {
